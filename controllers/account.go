@@ -131,14 +131,35 @@ func (c *ApiController) Signup() {
 		return
 	}
 
-	invitation, msg := object.CheckInvitationCode(application, organization, &authForm, c.GetAcceptLanguage())
-	if msg != "" {
-		c.ResponseError(msg)
-		return
-	}
+	pid := ""
 	invitationName := ""
-	if invitation != nil {
-		invitationName = invitation.Name
+	var invitation *object.Invitation
+
+	if authForm.InvitationCode != "" {
+		// 先检查用户邀请码
+		var err error
+		var puser *object.User
+		puser, err = object.GetUserIdByCode(authForm.Organization, authForm.InvitationCode)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		if puser != nil {
+			pid = puser.Id
+		}
+
+		// 如果找不到用户邀请码，再检查应用邀请码
+		if pid == "" {
+			var msg string
+			invitation, msg = object.CheckInvitationCode(application, organization, &authForm, c.GetAcceptLanguage())
+			if msg != "" {
+				c.ResponseError(msg)
+				return
+			}
+			if invitation != nil {
+				invitationName = invitation.Name
+			}
+		}
 	}
 
 	userEmailVerified := false
@@ -205,6 +226,8 @@ func (c *ApiController) Signup() {
 		userType = "paid-user"
 	}
 
+	randomCode := util.GenerateRandomString(9)
+
 	user := &object.User{
 		Owner:             authForm.Organization,
 		Name:              username,
@@ -235,6 +258,8 @@ func (c *ApiController) Signup() {
 		Invitation:        invitationName,
 		InvitationCode:    authForm.InvitationCode,
 		EmailVerified:     userEmailVerified,
+		Pid:               pid,
+		Code:              randomCode,
 	}
 
 	if len(organization.Tags) > 0 {
