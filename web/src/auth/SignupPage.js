@@ -112,6 +112,7 @@ class SignupPage extends React.Component {
       isTermsOfUseVisible: false,
       termsOfUseContent: "",
       invitationCode: "",
+      downloadUrl: "",
     };
 
     this.form = React.createRef();
@@ -138,6 +139,9 @@ class SignupPage extends React.Component {
         }
         if (sp.get("invite")) {
           this.setState({invitationCode: sp.get("invite")});
+        }
+        if (sp.get("downloadUrl")) {
+          this.setState({downloadUrl: sp.get("downloadUrl")});
         }
       } else if (oAuthParams !== null) {
         this.getApplicationLogin(oAuthParams);
@@ -256,6 +260,16 @@ class SignupPage extends React.Component {
     AuthBackend.signup(values)
       .then((res) => {
         if (res.status === "ok") {
+          // 2025.9.19 如果在浏览器打开，注册成功后，跳转到下载页
+          if (this.state.downloadUrl) {
+            const link = document.createElement("a");
+            link.href = this.state.downloadUrl;
+            link.target = "_blank";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return;
+          }
           // the user's id will be returned by `signup()`, if user signup by phone, the `username` in `values` is undefined.
           values.username = res.data.split("/")[1];
           if (Setting.hasPromptPage(application) && (!values.plan || !values.pricing)) {
