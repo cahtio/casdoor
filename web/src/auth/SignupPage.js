@@ -262,32 +262,34 @@ class SignupPage extends React.Component {
         if (res.status === "ok") {
           // 2025.9.19 如果在浏览器打开，注册成功后，跳转到下载页
           if (this.state.downloadUrl) {
-            const link = document.createElement("a");
-            link.href = this.state.downloadUrl;
-            link.target = "_blank";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            return;
-          }
-          // the user's id will be returned by `signup()`, if user signup by phone, the `username` in `values` is undefined.
-          values.username = res.data.split("/")[1];
-          if (Setting.hasPromptPage(application) && (!values.plan || !values.pricing)) {
-            AuthBackend.getAccount("")
-              .then((res) => {
-                let account = null;
-                if (res.status === "ok") {
-                  account = res.data;
-                  account.organization = res.data2;
-
-                  this.onUpdateAccount(account);
-                  Setting.goToLinkSoft(this, this.getResultPath(application, values));
-                } else {
-                  Setting.showMessage("error", `${i18next.t("application:Failed to sign in")}: ${res.msg}`);
-                }
-              });
+            message.success(i18next.t("signup:registered successfully"));
+            setTimeout(() => {
+              const link = document.createElement("a");
+              link.href = this.state.downloadUrl;
+              link.target = "_blank";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }, 1000);
           } else {
-            Setting.goToLinkSoft(this, this.getResultPath(application, values));
+            // the user's id will be returned by `signup()`, if user signup by phone, the `username` in `values` is undefined.
+            values.username = res.data.split("/")[1];
+            if (Setting.hasPromptPage(application) && (!values.plan || !values.pricing)) {
+              AuthBackend.getAccount("")
+                .then((res) => {
+                  let account = null;
+                  if (res.status === "ok") {
+                    account = res.data;
+                    account.organization = res.data2;
+                    this.onUpdateAccount(account);
+                    Setting.goToLinkSoft(this, this.getResultPath(application, values));
+                  } else {
+                    Setting.showMessage("error", `${i18next.t("application:Failed to sign in")}: ${res.msg}`);
+                  }
+                });
+            } else {
+              Setting.goToLinkSoft(this, this.getResultPath(application, values));
+            }
           }
         } else {
           Setting.showMessage("error", res.msg);
