@@ -30,7 +30,6 @@ import {withRouter} from "react-router-dom";
 import {CountryCodeSelect} from "../common/select/CountryCodeSelect";
 import * as PasswordChecker from "../common/PasswordChecker";
 import * as InvitationBackend from "../backend/InvitationBackend";
-
 const formItemLayout = {
   labelCol: {
     xs: {
@@ -112,6 +111,7 @@ class SignupPage extends React.Component {
       region: "",
       isTermsOfUseVisible: false,
       termsOfUseContent: "",
+      invitationCode: "",
     };
 
     this.form = React.createRef();
@@ -135,6 +135,9 @@ class SignupPage extends React.Component {
           if (invitationCode !== "") {
             this.getInvitationCodeInfo(invitationCode, "admin/" + this.state.applicationName);
           }
+        }
+        if (sp.get("invite")) {
+          this.setState({invitationCode: sp.get("invite")});
         }
       } else if (oAuthParams !== null) {
         this.getApplicationLogin(oAuthParams);
@@ -712,6 +715,7 @@ class SignupPage extends React.Component {
       return (
         <Form.Item
           name="invitationCode"
+          initialValue={this.state.invitationCode}
           className="signup-invitation-code"
           label={signupItem.label ? signupItem.label : i18next.t("application:Invitation code")}
           rules={[
@@ -905,6 +909,7 @@ class SignupPage extends React.Component {
               <div dangerouslySetInnerHTML={{__html: application.formSideHtml}} />
             </div>
             <div className="login-form">
+              {this.state.invitationCode ? <p className="sign-up-download">{i18next.t("signup:Already have an account?")} <a target="_blank" href="https://download.caht.io/download" rel="noreferrer">{i18next.t("signup:Download Now")}</a></p> : null}
               {
                 Setting.renderHelmet(application)
               }

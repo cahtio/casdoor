@@ -1091,6 +1091,8 @@
     "Username - Tooltip": "Username - Tooltip",
     "Your account has been created!": "Your account has been created!",
     "Your confirmed password is inconsistent with the password!": "Your confirmed password is inconsistent with the password!",
+    "Download Now":"Download Now",
+    "Already have an account?":"Already have an account?",
     "sign in now": "sign in now"
   },
   "subscription": {

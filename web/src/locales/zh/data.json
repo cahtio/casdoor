@@ -1091,6 +1091,8 @@
     "Username - Tooltip": "用户名",
     "Your account has been created!": "您的账号已成功创建！",
     "Your confirmed password is inconsistent with the password!": "您两次输入的密码不一致！",
+    "Download Now":"立即下载",
+    "Already have an account?":"已经有一个账号?",
     "sign in now": "立即登录"
   },
   "subscription": {
