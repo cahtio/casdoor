@@ -66,6 +66,7 @@ type LaravelResponse struct {
 	Id              string `json:"id"`
 	Name            string `json:"name"`
 	Email           string `json:"email"`
+	Avatar          string `json:"avatar"`
 	Pid             string `json:"pid"`
 	Code            string `json:"code"`
 	EmailVerifiedAt string `json:"email_verified_at"`
@@ -226,6 +227,10 @@ func (c *ApiController) Signup() {
 			return
 		}
 		userType = "paid-user"
+	}
+
+	if authForm.Name == "" {
+		authForm.Name = username
 	}
 
 	randomCode := util.GenerateRandomString(9)
@@ -564,6 +569,7 @@ func (c *ApiController) GetUserinfo2() {
 		Id:              user.Id,
 		Name:            user.Name,
 		Email:           user.Email,
+		Avatar:          user.Avatar,
 		Pid:             user.Pid,
 		Code:            user.Code,
 		EmailVerifiedAt: user.CreatedTime,
