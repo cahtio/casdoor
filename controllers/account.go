@@ -66,6 +66,8 @@ type LaravelResponse struct {
 	Id              string `json:"id"`
 	Name            string `json:"name"`
 	Email           string `json:"email"`
+	Pid             string `json:"pid"`
+	Code            string `json:"code"`
 	EmailVerifiedAt string `json:"email_verified_at"`
 	CreatedAt       string `json:"created_at"`
 	UpdatedAt       string `json:"updated_at"`
@@ -562,6 +564,8 @@ func (c *ApiController) GetUserinfo2() {
 		Id:              user.Id,
 		Name:            user.Name,
 		Email:           user.Email,
+		Pid:             user.Pid,
+		Code:            user.Code,
 		EmailVerifiedAt: user.CreatedTime,
 		CreatedAt:       user.CreatedTime,
 		UpdatedAt:       user.UpdatedTime,
