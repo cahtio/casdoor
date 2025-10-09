@@ -312,6 +312,6 @@ func initAPI() {
 
 	beego.Router("/api/faceid-signin-begin", &controllers.ApiController{}, "GET:FaceIDSigninBegin")
 
-	beego.Router("/api/app-callback", &controllers.ApiController{}, "GET:AppCallback")
 	beego.Router("/api/update-user2", &controllers.ApiController{}, "POST:UpdateUser2")
+	beego.Router("/api/user/invites", &controllers.ApiController{}, "GET:UserInvites")
 }

@@ -70,3 +70,18 @@ func (c *ApiController) UpdateUser2() {
 	c.Data["json"] = wrapActionResponse(affected)
 	c.ServeJSON()
 }
+
+func (c *ApiController) UserInvites() {
+	user, ok := c.RequireSignedInUser()
+	if !ok {
+		return
+	}
+
+	invites, err := object.GetUserInvites(user.Id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(invites)
+}
