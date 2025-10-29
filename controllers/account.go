@@ -233,7 +233,7 @@ func (c *ApiController) Signup() {
 		authForm.Name = username
 	}
 
-	randomCode := util.GenerateRandomString(9)
+	randomCode := util.GenerateRandomString(12)
 
 	user := &object.User{
 		Owner:             authForm.Organization,

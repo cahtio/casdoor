@@ -89,7 +89,7 @@ func UploadUsers(owner string, path string) (bool, error) {
 	for _, user := range transUsers {
 		if _, ok := oldUserMap[user.GetId()]; !ok {
 			// 为新导入的用户生成随机code，长度为10
-			user.Code = util.GenerateRandomString(9)
+			user.Code = util.GenerateRandomString(12)
 			newUsers = append(newUsers, user)
 		}
 	}

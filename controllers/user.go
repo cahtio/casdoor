@@ -369,7 +369,7 @@ func (c *ApiController) AddUser() {
 
 	// 生成随机code，长度为16
 	if user.Code == "" {
-		user.Code = util.GenerateRandomString(9)
+		user.Code = util.GenerateRandomString(12)
 	}
 
 	// 处理invitationCode，获取上级用户ID

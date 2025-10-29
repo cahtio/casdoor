@@ -1002,6 +1002,10 @@ func AddUser(user *User, lang string) (bool, error) {
 		user.Name = strings.ToLower(user.Name)
 	}
 
+	if user.Code == "" {
+		user.Code = util.GenerateRandomString(12)
+	}
+
 	affected, err := ormer.Engine.Insert(user)
 	if err != nil {
 		return false, err
@@ -1039,6 +1043,10 @@ func AddUsers(users []*User) (bool, error) {
 			if err != nil {
 				return false, err
 			}
+		}
+
+		if user.Code == "" {
+			user.Code = util.GenerateRandomString(12)
 		}
 
 		user.Name = strings.TrimSpace(user.Name)
