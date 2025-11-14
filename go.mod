@@ -5,10 +5,10 @@ go 1.21
 require (
 	github.com/Masterminds/squirrel v1.5.3
 	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387
-	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.4
+	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.9
 	github.com/alibabacloud-go/facebody-20191230/v5 v5.1.2
 	github.com/alibabacloud-go/openapi-util v0.1.0
-	github.com/alibabacloud-go/tea v1.3.2
+	github.com/alibabacloud-go/tea v1.3.10
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.7
 	github.com/aws/aws-sdk-go v1.45.5
 	github.com/beego/beego v1.12.12
@@ -89,6 +89,7 @@ require (
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.5 // indirect
 	github.com/alibabacloud-go/darabonba-number v1.0.4 // indirect
 	github.com/alibabacloud-go/debug v1.0.1 // indirect
+	github.com/alibabacloud-go/dysmsapi-20180501/v2 v2.0.7 // indirect
 	github.com/alibabacloud-go/endpoint-util v1.1.0 // indirect
 	github.com/alibabacloud-go/openplatform-20191219/v2 v2.0.1 // indirect
 	github.com/alibabacloud-go/tea-fileform v1.1.1 // indirect
@@ -98,7 +99,7 @@ require (
 	github.com/alibabacloud-go/tea-xml v1.1.3 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.545 // indirect
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.2+incompatible // indirect
-	github.com/aliyun/credentials-go v1.3.10 // indirect
+	github.com/aliyun/credentials-go v1.4.5 // indirect
 	github.com/apistd/uni-go-sdk v0.0.2 // indirect
 	github.com/atc0005/go-teams-notify/v2 v2.13.0 // indirect
 	github.com/baidubce/bce-sdk-go v0.9.156 // indirect

@@ -45,6 +45,12 @@ type NotificationForm struct {
 	Content string `json:"content"`
 }
 
+type SmsGlobeForm struct {
+	To      string `json:"to"`
+	From    string `json:"from"`
+	Message string `json:"message"`
+}
+
 // SendEmail
 // @Title SendEmail
 // @Tag Service API
@@ -221,5 +227,50 @@ func (c *ApiController) SendNotification() {
 		return
 	}
 
+	c.ResponseOk()
+}
+
+func (c *ApiController) GetSmsTemplate() {
+	inviter := c.Input().Get("inviter")
+	invitee := c.Input().Get("invitee")
+	inviteCode := c.Input().Get("inviteCode")
+	lang := c.Input().Get("lang")
+
+	if util.IsStringsEmpty(inviter, invitee, inviteCode) {
+		c.ResponseError(c.T("service:Empty parameters for GetSmsTemplate"))
+		return
+	}
+
+	template, err := object.GetInviteSmsTemplate(inviter, invitee, inviteCode, lang)
+
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	c.ResponseOk(template)
+}
+
+func (c *ApiController) SendSmsGlobe() {
+	var smsGlobeForm SmsGlobeForm
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &smsGlobeForm)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	message := smsGlobeForm.Message
+	phoneNumber := smsGlobeForm.To
+
+	if util.IsStringsEmpty(message, phoneNumber) {
+		c.ResponseError(c.T("service:Empty parameters for SendSmsGlobe"))
+		return
+	}
+
+	err = object.SendSmsGlobe(message, phoneNumber)
+
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
 	c.ResponseOk()
 }

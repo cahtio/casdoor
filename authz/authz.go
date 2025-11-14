@@ -105,6 +105,8 @@ p, *, *, GET, /api/get-invitation-info, *, *
 p, *, *, GET, /api/faceid-signin-begin, *, *
 p, *, *, POST, /api/update-user2, *, *
 p, *, *, GET, /api/user/invites, *, *
+p, *, *, GET, /api/get-sms-template, *, *
+p, *, *, POST, /api/send-sms-globe, *, *
 `
 
 		sa := stringadapter.NewAdapter(ruleText)
