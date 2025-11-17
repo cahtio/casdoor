@@ -270,8 +270,8 @@ func (c *ApiController) SendSmsGlobe() {
 	message := smsGlobeForm.Message
 	phoneNumber := smsGlobeForm.To
 
-	if util.IsStringsEmpty(phoneNumber) {
-		c.ResponseError(c.T("service:Empty phoneNumber for SendSms"))
+	if util.IsStringsEmpty(message, phoneNumber) {
+		c.ResponseError("Empty message or phoneNumber for SendSms")
 		return
 	}
 
