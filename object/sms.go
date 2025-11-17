@@ -124,13 +124,13 @@ func GetInviteSmsTemplate(inviter, invitee, inviteCode, lang string) (string, er
 	case "cn":
 		template = `【CaHt】 嗨，{invitee}！我正在使用一款超棒的全新聊天应用 CaHt，{inviter} 诚挚邀请您的加入！快来和我们一起体验快速、有趣的沟通方式吧！
 
-点击注册：https://oauth.caht.io/signup/CaHtioIM?invite=${inviteCode}
+点击注册：https://oauth.caht.io/signup/CaHtioIM?invite={inviteCode}
 
 期待在 CaHt 上与您相见！`
 	default:
 		template = `[CaHt] Hi there, {invitee}! I'm using an awesome new chat app called CaHt,  {inviter} sincerely invites you to join! Come experience fast and fun communication with us!
 
-Click to register: https://oauth.caht.io/signup/CaHtioIM?invite=${inviteCode}
+Click to register: https://oauth.caht.io/signup/CaHtioIM?invite={inviteCode}
 
 Looking forward to seeing you on CaHt!`
 	}
