@@ -81,7 +81,6 @@ func SendSmsGlobe(message string, phoneNumber string) error {
 	}
 
 	aliConfig := aliyunConfig{}
-	fmt.Println("AliyunSmsStr:", conf.GetConfigString("AliyunSms"))
 	err := json.Unmarshal([]byte(conf.GetConfigString("AliyunSms")), &aliConfig)
 	if err != nil {
 		return fmt.Errorf("error unmarshal aliyun config: %w", err)

@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/casdoor/casdoor/object"
 	"github.com/casdoor/casdoor/util"
@@ -47,7 +48,7 @@ type NotificationForm struct {
 
 type SmsGlobeForm struct {
 	To      string `json:"to"`
-	From    string `json:"from"`
+	From    string `json:"from,omitempty"`
 	Message string `json:"message"`
 }
 
@@ -250,7 +251,15 @@ func (c *ApiController) GetSmsTemplate() {
 	c.ResponseOk(template)
 }
 
+// 创建短信限流器实例
+var smsCache = util.NewCache(24*time.Hour, 1*time.Hour)
+
 func (c *ApiController) SendSmsGlobe() {
+	userId, ok := c.RequireSignedIn()
+	if !ok {
+		return
+	}
+
 	var smsGlobeForm SmsGlobeForm
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &smsGlobeForm)
 	if err != nil {
@@ -261,16 +270,37 @@ func (c *ApiController) SendSmsGlobe() {
 	message := smsGlobeForm.Message
 	phoneNumber := smsGlobeForm.To
 
-	if util.IsStringsEmpty(message, phoneNumber) {
-		c.ResponseError(c.T("service:Empty parameters for SendSmsGlobe"))
+	if util.IsStringsEmpty(phoneNumber) {
+		c.ResponseError(c.T("service:Empty phoneNumber for SendSms"))
+		return
+	}
+
+	// 检查短信限流
+	dailyKey := fmt.Sprintf("sms-daily-%s", userId)
+	intervalKey := fmt.Sprintf("sms-interval-%s", userId)
+
+	// 检查每日限额（30条）
+	dailyCount := smsCache.GetCount(dailyKey)
+	if dailyCount >= 30 {
+		c.ResponseError("Daily SMS limit exceeded (30 messages per day)")
+		return
+	}
+
+	// 检查间隔限制（3秒）
+	if smsCache.Has(intervalKey) {
+		c.ResponseError("Please wait 3 seconds between SMS sends")
 		return
 	}
 
 	err = object.SendSmsGlobe(message, phoneNumber)
-
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
+
+	// 记录发送成功
+	smsCache.Increment(dailyKey, 24*time.Hour)
+	smsCache.Set(intervalKey, true, 3*time.Second)
+
 	c.ResponseOk()
 }
