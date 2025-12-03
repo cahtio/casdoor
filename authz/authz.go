@@ -107,6 +107,7 @@ p, *, *, POST, /api/update-user2, *, *
 p, *, *, GET, /api/user/invites, *, *
 p, *, *, GET, /api/get-sms-template, *, *
 p, *, *, POST, /api/send-sms-globe, *, *
+p, *, *, GET, /api/get-application2, *, *
 `
 
 		sa := stringadapter.NewAdapter(ruleText)
