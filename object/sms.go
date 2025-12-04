@@ -110,12 +110,15 @@ func SendSmsGlobe(message string, phoneNumber string) error {
 		Message: tea.String(message),
 	}
 
-	_, _err = client.SendMessageToGlobe(sendMessageToGlobeRequest)
+	res, _err := client.SendMessageToGlobe(sendMessageToGlobeRequest)
 	if _err != nil {
-		return fmt.Errorf("error send sms globe: %w", _err)
+		return fmt.Errorf("error send sms : %w", _err)
 	}
 
-	return nil
+	if *res.GetBody().ResponseCode == "OK" {
+		return nil
+	}
+	return fmt.Errorf("error send sms : %s", *res.Body.ResponseDescription)
 }
 
 func GetInviteSmsTemplate(inviter, invitee, inviteCode, lang string) (string, error) {
