@@ -317,4 +317,5 @@ func initAPI() {
 	beego.Router("/api/get-sms-template", &controllers.ApiController{}, "GET:GetSmsTemplate")
 	beego.Router("/api/send-sms-globe", &controllers.ApiController{}, "POST:SendSmsGlobe")
 	beego.Router("/api/get-application2", &controllers.ApiController{}, "GET:GetApplication2")
+	beego.Router("/api/ads", &controllers.ApiController{}, "GET:Ads")
 }

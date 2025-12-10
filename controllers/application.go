@@ -310,7 +310,8 @@ func (c *ApiController) GetApplication2() {
 	if limit == "" || page == "" {
 		var applications []*object.Application
 		if organization == "" {
-			applications, err = object.GetApplications(owner)
+			applications, err = object.GetOrganizationApplications(owner, "cahtio")
+			//applications, err = object.GetApplications(owner)
 		} else {
 			applications, err = object.GetOrganizationApplications(owner, organization)
 		}
