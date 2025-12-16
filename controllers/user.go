@@ -367,6 +367,23 @@ func (c *ApiController) AddUser() {
 		return
 	}
 
+	// 生成随机code，长度为16
+	if user.Code == "" {
+		user.Code = util.GenerateRandomString(12)
+	}
+
+	// 处理invitationCode，获取上级用户ID
+	var puser *object.User
+	puser, err = object.GetUserIdByCode(user.Owner, user.Code)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	if puser != nil {
+		user.Pid = puser.Id
+	}
+
 	c.Data["json"] = wrapActionResponse(object.AddUser(&user, c.GetAcceptLanguage()))
 	c.ServeJSON()
 }

@@ -216,6 +216,9 @@ type User struct {
 	MfaRememberDeadline string           `xorm:"varchar(100)" json:"mfaRememberDeadline"`
 	NeedUpdatePassword  bool             `json:"needUpdatePassword"`
 	IpWhitelist         string           `xorm:"varchar(200)" json:"ipWhitelist"`
+
+	Pid  string `xorm:"varchar(100) index" json:"pid"`
+	Code string `xorm:"varchar(100) index" json:"code"`
 }
 
 type Userinfo struct {
@@ -232,6 +235,8 @@ type Userinfo struct {
 	Groups        []string `json:"groups,omitempty"`
 	Roles         []string `json:"roles,omitempty"`
 	Permissions   []string `json:"permissions,omitempty"`
+	Pid           string   `json:"pid,omitempty"`
+	Code          string   `json:"code,omitempty"`
 }
 
 type ManagedAccount struct {
@@ -587,6 +592,25 @@ func GetUserByInvitationCode(owner string, invitationCode string) (*User, error)
 	}
 
 	user := User{Owner: owner, InvitationCode: invitationCode}
+	existed, err := ormer.Engine.Get(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	if existed {
+		return &user, nil
+	} else {
+		return nil, nil
+	}
+}
+
+// GetUserIdByCode 通过邀请码获取用户ID，没有则返回nil
+func GetUserIdByCode(owner string, code string) (*User, error) {
+	if code == "" {
+		return nil, nil
+	}
+
+	user := User{Owner: owner, Code: code}
 	existed, err := ormer.Engine.Get(&user)
 	if err != nil {
 		return nil, err
@@ -978,6 +1002,10 @@ func AddUser(user *User, lang string) (bool, error) {
 		user.Name = strings.ToLower(user.Name)
 	}
 
+	if user.Code == "" {
+		user.Code = util.GenerateRandomString(12)
+	}
+
 	affected, err := ormer.Engine.Insert(user)
 	if err != nil {
 		return false, err
@@ -1015,6 +1043,10 @@ func AddUsers(users []*User) (bool, error) {
 			if err != nil {
 				return false, err
 			}
+		}
+
+		if user.Code == "" {
+			user.Code = util.GenerateRandomString(12)
 		}
 
 		user.Name = strings.TrimSpace(user.Name)
@@ -1108,6 +1140,9 @@ func GetUserInfo(user *User, scope string, aud string, host string) (*Userinfo, 
 		resp.DisplayName = user.DisplayName
 		resp.Avatar = user.Avatar
 		resp.Groups = user.Groups
+		resp.Groups = user.Groups
+		resp.Pid = user.Pid
+		resp.Code = user.Code
 
 		err := ExtendUserWithRolesAndPermissions(user)
 		if err != nil {

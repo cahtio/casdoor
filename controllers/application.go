@@ -294,3 +294,49 @@ func (c *ApiController) DeleteApplication() {
 	c.Data["json"] = wrapActionResponse(object.DeleteApplication(&application))
 	c.ServeJSON()
 }
+
+func (c *ApiController) GetApplication2() {
+	userId := c.GetSessionUsername()
+	owner := c.Input().Get("owner")
+	limit := c.Input().Get("pageSize")
+	page := c.Input().Get("p")
+	field := c.Input().Get("field")
+	value := c.Input().Get("value")
+	sortField := c.Input().Get("sortField")
+	sortOrder := c.Input().Get("sortOrder")
+	organization := c.Input().Get("organization")
+	version := c.Input().Get("version")
+	var err error
+	if limit == "" || page == "" {
+		var applications []*object.Application
+		if organization == "" {
+			applications, err = object.GetOrganizationApplications(owner, "cahtio")
+			//applications, err = object.GetApplications(owner)
+		} else {
+			applications, err = object.GetOrganizationApplications(owner, organization)
+		}
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		applications = object.GetMaskedApplicationsByVersion(applications, userId, version)
+		c.ResponseOk(applications)
+	} else {
+		limit := util.ParseInt(limit)
+		count, err := object.GetApplicationCount(owner, field, value)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		paginator := pagination.SetPaginator(c.Ctx, limit, count)
+		application, err := object.GetPaginationApplications(owner, paginator.Offset(), limit, field, value, sortField, sortOrder)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
+		applications := object.GetMaskedApplicationsByVersion(application, userId, version)
+		c.ResponseOk(applications, paginator.Nums())
+	}
+}

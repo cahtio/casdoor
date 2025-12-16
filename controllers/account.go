@@ -66,6 +66,9 @@ type LaravelResponse struct {
 	Id              string `json:"id"`
 	Name            string `json:"name"`
 	Email           string `json:"email"`
+	Avatar          string `json:"avatar"`
+	Pid             string `json:"pid"`
+	Code            string `json:"code"`
 	EmailVerifiedAt string `json:"email_verified_at"`
 	CreatedAt       string `json:"created_at"`
 	UpdatedAt       string `json:"updated_at"`
@@ -131,14 +134,35 @@ func (c *ApiController) Signup() {
 		return
 	}
 
-	invitation, msg := object.CheckInvitationCode(application, organization, &authForm, c.GetAcceptLanguage())
-	if msg != "" {
-		c.ResponseError(msg)
-		return
-	}
+	pid := ""
 	invitationName := ""
-	if invitation != nil {
-		invitationName = invitation.Name
+	var invitation *object.Invitation
+
+	if authForm.InvitationCode != "" {
+		// 先检查用户邀请码
+		var err error
+		var puser *object.User
+		puser, err = object.GetUserIdByCode(authForm.Organization, authForm.InvitationCode)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		if puser != nil {
+			pid = puser.Id
+		}
+
+		// 如果找不到用户邀请码，再检查应用邀请码
+		if pid == "" {
+			var msg string
+			invitation, msg = object.CheckInvitationCode(application, organization, &authForm, c.GetAcceptLanguage())
+			if msg != "" {
+				c.ResponseError(msg)
+				return
+			}
+			if invitation != nil {
+				invitationName = invitation.Name
+			}
+		}
 	}
 
 	userEmailVerified := false
@@ -205,6 +229,12 @@ func (c *ApiController) Signup() {
 		userType = "paid-user"
 	}
 
+	if authForm.Name == "" {
+		authForm.Name = username
+	}
+
+	randomCode := util.GenerateRandomString(12)
+
 	user := &object.User{
 		Owner:             authForm.Organization,
 		Name:              username,
@@ -235,6 +265,8 @@ func (c *ApiController) Signup() {
 		Invitation:        invitationName,
 		InvitationCode:    authForm.InvitationCode,
 		EmailVerified:     userEmailVerified,
+		Pid:               pid,
+		Code:              randomCode,
 	}
 
 	if len(organization.Tags) > 0 {
@@ -537,6 +569,9 @@ func (c *ApiController) GetUserinfo2() {
 		Id:              user.Id,
 		Name:            user.Name,
 		Email:           user.Email,
+		Avatar:          user.Avatar,
+		Pid:             user.Pid,
+		Code:            user.Code,
 		EmailVerifiedAt: user.CreatedTime,
 		CreatedAt:       user.CreatedTime,
 		UpdatedAt:       user.UpdatedTime,

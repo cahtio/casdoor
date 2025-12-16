@@ -312,5 +312,10 @@ func initAPI() {
 
 	beego.Router("/api/faceid-signin-begin", &controllers.ApiController{}, "GET:FaceIDSigninBegin")
 
-	beego.Router("/api/app-callback", &controllers.ApiController{}, "GET:AppCallback")
+	beego.Router("/api/update-user2", &controllers.ApiController{}, "POST:UpdateUser2")
+	beego.Router("/api/user/invites", &controllers.ApiController{}, "GET:UserInvites")
+	beego.Router("/api/get-sms-template", &controllers.ApiController{}, "GET:GetSmsTemplate")
+	beego.Router("/api/send-sms-globe", &controllers.ApiController{}, "POST:SendSmsGlobe")
+	beego.Router("/api/get-application2", &controllers.ApiController{}, "GET:GetApplication2")
+	beego.Router("/api/ads", &controllers.ApiController{}, "GET:Ads")
 }

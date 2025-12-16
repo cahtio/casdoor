@@ -103,7 +103,12 @@ p, *, *, GET, /api/run-casbin-command, *, *
 p, *, *, POST, /api/refresh-engines, *, *
 p, *, *, GET, /api/get-invitation-info, *, *
 p, *, *, GET, /api/faceid-signin-begin, *, *
-p, *, *, GET, /api/app-callback, *, *
+p, *, *, POST, /api/update-user2, *, *
+p, *, *, GET, /api/user/invites, *, *
+p, *, *, GET, /api/get-sms-template, *, *
+p, *, *, POST, /api/send-sms-globe, *, *
+p, *, *, GET, /api/get-application2, *, *
+p, *, *, GET, /api/ads, *, *
 `
 
 		sa := stringadapter.NewAdapter(ruleText)

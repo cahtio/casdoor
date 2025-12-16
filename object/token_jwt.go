@@ -48,6 +48,9 @@ type UserShort struct {
 	Avatar      string `xorm:"varchar(500)" json:"avatar"`
 	Email       string `xorm:"varchar(100) index" json:"email"`
 	Phone       string `xorm:"varchar(100) index" json:"phone"`
+
+	Pid  string `xorm:"varchar(100) index" json:"pid"`
+	Code string `xorm:"varchar(100) index" json:"code"`
 }
 
 type UserStandard struct {
@@ -59,6 +62,8 @@ type UserStandard struct {
 	Avatar      string `xorm:"varchar(500)" json:"picture,omitempty"`
 	Email       string `xorm:"varchar(100) index" json:"email,omitempty"`
 	Phone       string `xorm:"varchar(100) index" json:"phone,omitempty"`
+	Pid         string `xorm:"varchar(100) index" json:"pid"`
+	Code        string `xorm:"varchar(100) index" json:"code"`
 }
 
 type UserWithoutThirdIdp struct {
@@ -147,6 +152,9 @@ type UserWithoutThirdIdp struct {
 	SigninWrongTimes    int    `json:"signinWrongTimes"`
 
 	ManagedAccounts []ManagedAccount `xorm:"managedAccounts blob" json:"managedAccounts"`
+
+	Pid  string `xorm:"varchar(100) index" json:"pid"`
+	Code string `xorm:"varchar(100) index" json:"code"`
 }
 
 type ClaimsShort struct {
@@ -185,14 +193,16 @@ type ClaimsWithoutThirdIdp struct {
 
 func getShortUser(user *User) *UserShort {
 	res := &UserShort{
-		Owner: user.Owner,
-		Name:  user.Name,
-
+		Owner:       user.Owner,
+		Name:        user.Name,
 		Id:          user.Id,
 		DisplayName: user.DisplayName,
 		Avatar:      user.Avatar,
 		Email:       user.Email,
 		Phone:       user.Phone,
+
+		Pid:  user.Pid,
+		Code: user.Code,
 	}
 	return res
 }
@@ -207,6 +217,9 @@ func getStandardUser(user *User) *UserStandard {
 		Avatar:      user.Avatar,
 		Email:       user.Email,
 		Phone:       user.Phone,
+
+		Pid:  user.Pid,
+		Code: user.Code,
 	}
 	return res
 }
@@ -296,6 +309,9 @@ func getUserWithoutThirdIdp(user *User) *UserWithoutThirdIdp {
 		SigninWrongTimes:    user.SigninWrongTimes,
 
 		ManagedAccounts: user.ManagedAccounts,
+
+		Pid:  user.Pid,
+		Code: user.Code,
 	}
 
 	return res

@@ -15,6 +15,7 @@
 package object
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -923,4 +924,39 @@ func applicationChangeTrigger(oldName string, newName string) error {
 	}
 
 	return session.Commit()
+}
+
+func GetMaskedApplicationsByVersion(applications []*Application, userId string, version string) []*Application {
+	//if isUserIdGlobalAdmin(userId) {
+	//	return applications
+	//}
+	var newApplications []*Application
+	for _, application := range applications {
+		if application.Description != "" {
+			var des struct {
+				//Description string `json:"description"`
+				Version string `json:"version"`
+			}
+			err := json.Unmarshal([]byte(application.Description), &des)
+			if err == nil {
+				if des.Version != "" && version != "" {
+					if util.CompareVersion(version, des.Version) == 1 {
+						continue
+					}
+				}
+			}
+		}
+		application = GetSimpleApplication(application)
+		newApplications = append(newApplications, application)
+	}
+	return newApplications
+}
+
+func GetSimpleApplication(application *Application) *Application {
+	return &Application{
+		DisplayName: application.DisplayName,
+		HomepageUrl: application.HomepageUrl,
+		Logo:        application.Logo,
+		Description: application.Description,
+	}
 }
