@@ -103,23 +103,10 @@ export function requestEthereumAccount() {
 }
 
 export function signEthereumTypedData(from, nonce) {
-  // 详细检查 chainId 类型
-  // eslint-disable-next-line no-console
-  console.log("🔍 signEthereumTypedData - chainId details:", {
-    chainId: window.ethereum.chainId,
-    type: typeof window.ethereum.chainId,
-    isBigInt: typeof window.ethereum.chainId === "bigint",
-    isString: typeof window.ethereum.chainId === "string",
-    isNumber: typeof window.ethereum.chainId === "number",
-    valueOf: window.ethereum.chainId?.valueOf?.(),
-    toString: window.ethereum.chainId?.toString?.(),
-    hex: window.ethereum.chainId?.toString(16),
-    decimal: window.ethereum.chainId?.toString(10),
-  });
 
   // 测试序列化
   try {
-    const testObj = {chainId: window.ethereum.chainId};
+    const testObj = {chainId: getChainId()};
     const testJson = JSON.stringify(testObj);
     // eslint-disable-next-line no-console
     console.log("✅ chainId JSON serialization test passed:", testJson);
@@ -132,7 +119,7 @@ export function signEthereumTypedData(from, nonce) {
   const date = new Date();
   const typedData = JSON.stringify({
     domain: {
-      chainId: window.ethereum.chainId,
+      chainId: getChainId(),
       name: "Casdoor",
       version: "1",
     },
@@ -214,30 +201,30 @@ const chains = [
     label: "Ethereum Mainnet",
     rpcUrl: "https://mainnet.infura.io/v3/9bba525b2b7f4a5581a62399fb4f88a1",
   },
-  // {
-  //   id: 5, // Goerli Testnet
-  //   token: "ETH",
-  //   label: "Goerli",
-  //   rpcUrl: "https://goerli.infura.io/v3/9bba525b2b7f4a5581a62399fb4f88a1",
-  // },
-  // {
-  //   id: 56, // BNB Smart Chain Mainnet (注意：38不是标准BNB链ID，标准的应该是56)
-  //   token: "BNB",
-  //   label: "BNB Smart Chain",
-  //   rpcUrl: "https://bsc-dataseed.binance.org/",
-  // },
-  // {
-  //   id: 137, // Polygon Mainnet
-  //   token: "MATIC",
-  //   label: "Polygon",
-  //   rpcUrl: "https://polygon-rpc.com",
-  // },
-  // {
-  //   id: 42161, // Arbitrum One
-  //   token: "ETH",
-  //   label: "Arbitrum",
-  //   rpcUrl: "https://arb1.arbitrum.io/rpc",
-  // },
+  {
+    id: "0x5", // Goerli Testnet
+    token: "ETH",
+    label: "Goerli",
+    rpcUrl: "https://goerli.infura.io/v3/9bba525b2b7f4a5581a62399fb4f88a1",
+  },
+  {
+    id: "0x56", // BNB Smart Chain Mainnet (注意：标准的应该是56)
+    token: "BNB",
+    label: "BNB Smart Chain",
+    rpcUrl: "https://bsc-dataseed.binance.org/",
+  },
+  {
+    id: "0x137", // Polygon Mainnet 137
+    token: "MATIC",
+    label: "Polygon",
+    rpcUrl: "https://polygon-rpc.com",
+  },
+  {
+    id: "0x42161", // Arbitrum One 42161
+    token: "ETH",
+    label: "Arbitrum",
+    rpcUrl: "https://arb1.arbitrum.io/rpc",
+  },
   {
     id: "0x14a34", // Base Sepolia 测试网，注意：Base 主网是8453，但日志中是84532，所以可能是测试网
     token: "ETH",
@@ -268,7 +255,7 @@ try {
     dappUrl,
     requiredChains: [1],
     // optionalChains: ["0x14a34"],
-    // optionalChains: [5, 56],
+    optionalChains: [5, 56, 137, 42161],
     qrModalOptions: {
       // 移动端钱包的深度链接
       enableExplorer: true,
@@ -454,24 +441,13 @@ export async function authViaWeb3Onboard(application, provider, method) {
   try {
     // eslint-disable-next-line no-console
     console.trace("Function entry point");
-    // eslint-disable-next-line no-console
-    console.log("chainId type check1:", {
-      value: window.ethereum.chainId,
-      type: typeof window.ethereum.chainId,
-      isBigInt: typeof window.ethereum.chainId === "bigint",
-    });
+
     const onboard = initWeb3Onboard(application, provider);
 
     if (!onboard) {
       throw new Error("Failed to initialize Web3Onboard");
     }
 
-    // eslint-disable-next-line no-console
-    console.log("chainId type check2:", {
-      value: window.ethereum.chainId,
-      type: typeof window.ethereum.chainId,
-      isBigInt: typeof window.ethereum.chainId === "bigint",
-    });
     // 尝试安全转换
     let wallets = null;
     try {
@@ -482,9 +458,9 @@ export async function authViaWeb3Onboard(application, provider, method) {
 
       // 显示钱包选择器并连接钱包
       wallets = await onboard.connectWallet();
-      const test = Number(window.ethereum.chainId);
+      // const test = Number(getChainId());
       // eslint-disable-next-line no-console
-      console.log("Safe conversion successful:", test);
+      // console.log("Safe conversion successful:", test);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Conversion failed:", error);
@@ -599,4 +575,14 @@ export async function setChain(chainId) {
     console.error("Failed to set chain:", err.message);
     return false;
   }
+}
+
+function getChainId() {
+  if (!window.ethereum) {
+    throw new Error("Ethereum provider not found");
+  }
+  if (!window.ethereum.chainId) {
+    throw new Error("Chain ID not available");
+  }
+  return window.ethereum.chainId;
 }
