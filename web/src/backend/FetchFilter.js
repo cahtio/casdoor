@@ -47,6 +47,9 @@ if (Conf.IsDemoMode) {
 }
 
 window.fetch = async(url, option = {}) => {
+  if (typeof url !== "string") {
+    url = String(url);
+  }
   requestFilters.forEach(filter => filter(url, option));
 
   return new Promise((resolve, reject) => {

@@ -14,19 +14,21 @@
     "@uiw/codemirror-theme-material": "^4.23.8",
     "@uiw/react-codemirror": "^4.23.8",
     "@web3-onboard/coinbase": "^2.2.5",
-    "@web3-onboard/core": "^2.20.5",
+    "@web3-onboard/core": "^2.24.1",
     "@web3-onboard/frontier": "^2.0.4",
     "@web3-onboard/gnosis": "^2.1.10",
     "@web3-onboard/infinity-wallet": "^2.0.4",
-    "@web3-onboard/injected-wallets": "^2.10.4",
+    "@web3-onboard/injected-wallets": "^2.11.0",
     "@web3-onboard/phantom": "^2.1.1",
-    "@web3-onboard/react": "^2.8.10",
+    "@web3-onboard/react": "^2.11.0",
     "@web3-onboard/sequence": "^2.0.8",
     "@web3-onboard/taho": "^2.0.5",
     "@web3-onboard/trust": "^2.0.4",
+    "@web3-onboard/walletconnect": "^2.6.3",
     "antd": "5.24.1",
     "antd-token-previewer": "^2.0.8",
     "buffer": "^6.0.3",
+    "caniuse-lite": "^1.0.30001760",
     "codemirror": "^6.0.1",
     "copy-to-clipboard": "^3.3.1",
     "core-js": "^3.25.0",
@@ -73,10 +75,10 @@
   },
   "browserslist": {
     "production": [
+      "supports bigint",
       ">0.2%",
       "not dead",
-      "not op_mini all",
-      "ie > 8"
+      "not op_mini all"
     ],
     "development": [
       "last 1 chrome version",
