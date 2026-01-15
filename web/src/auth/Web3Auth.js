@@ -382,6 +382,8 @@ function getWeb3OnboardWallets(options) {
 
 // 初始化Web3Onboard
 export function initWeb3Onboard(application, provider) {
+  // 清除本地存储的token
+  clearWeb3AuthToken();
   // eslint-disable-next-line no-console
   console.log(`initWeb3Onboard: application=, provider=${JSON.stringify(provider)}`);
 
@@ -429,6 +431,8 @@ export function initWeb3Onboard(application, provider) {
     console.log("Web3Onboard initialized:", web3Onboard);
     return web3Onboard;
   } catch (err) {
+    // 清除本地存储的token
+    clearWeb3AuthToken();
     // eslint-disable-next-line no-console
     console.error("initWeb3Onboard error:", err);
     showMessage("error", `Failed to initialize Web3Onboard: ${err.message}`);
@@ -501,6 +505,8 @@ export async function authViaWeb3Onboard(application, provider, method) {
       throw new Error("No wallet connected");
     }
   } catch (err) {
+    // 清除本地存储的token
+    clearWeb3AuthToken();
     // eslint-disable-next-line no-console
     console.error("authViaWeb3Onboard error:", {
       message: err.message,
