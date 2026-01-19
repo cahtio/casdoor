@@ -36,6 +36,8 @@ import "core-js/features/number";
 
 // 为Buffer设置全局变量
 global.Buffer = Buffer;
+// 方便APP打开时调试
+// appDebugDiv();
 
 // 添加安全的BigInt处理函数
 export function safeBigIntToNumber(value) {
@@ -84,9 +86,53 @@ export function clearWeb3AuthToken() {
   const keys = Object.keys(localStorage);
   keys.forEach(key => {
     if (key.startsWith("Web3AuthToken_")) {
+      // eslint-disable-next-line no-console
+      console.log(`clearWeb3AuthToken 删除: ${key}`);
       localStorage.removeItem(key);
     }
   });
+}
+
+// 清理WalletConnect的本地存储 - 增强版
+export function clearWalletconnect() {
+  // eslint-disable-next-line no-console
+  console.log("清理前localStorage键:", Object.keys(localStorage));
+  if (typeof localStorage !== "undefined") {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        // 匹配更多可能的WalletConnect键名
+        const keyLower = key.toLowerCase();
+        if (
+          keyLower.includes("walletconnect") ||
+          keyLower.includes("wc@") || // WalletConnect V2格式
+          keyLower.includes("wc-") ||
+          key.includes("W3M") || // Web3Modal格式
+          key.includes("WALLETCONNECT") ||
+          key.includes("wc::") || // 新的命名空间
+          key.includes("web3modal") ||
+          key.includes("@appkit/") ||  // 添加@appkit相关
+          key.includes("onboard")
+        ) {
+          keysToRemove.push(key);
+          // eslint-disable-next-line no-console
+          console.log(`🗑️ 标记删除: ${key}`);
+        }
+      }
+    }
+
+    if (keysToRemove.length > 0) {
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+        // eslint-disable-next-line no-console
+        console.log(`✅ 已删除: ${key}`);
+      });
+    } else {
+      // eslint-disable-next-line no-console
+      console.log("ℹ️ 未找到WalletConnect相关存储");
+    }
+  }
 }
 
 export function detectMetaMaskPlugin() {
@@ -208,25 +254,25 @@ const chains = [
     rpcUrl: "https://goerli.infura.io/v3/9bba525b2b7f4a5581a62399fb4f88a1",
   },
   {
-    id: "0x56", // BNB Smart Chain Mainnet (注意：标准的应该是56)
+    id: "0x38", // BNB Smart Chain Mainnet 即 0x38==56
     token: "BNB",
     label: "BNB Smart Chain",
-    rpcUrl: "https://bsc-dataseed.binance.org/",
+    rpcUrl: "https://binance.llamarpc.com",
   },
   {
-    id: "0x137", // Polygon Mainnet 137
+    id: "0x89", // Polygon Mainnet 137
     token: "MATIC",
     label: "Polygon",
     rpcUrl: "https://polygon-rpc.com",
   },
   {
-    id: "0x42161", // Arbitrum One 42161
+    id: "0xA4B1", // Arbitrum One 42161
     token: "ETH",
-    label: "Arbitrum",
+    label: "Arbitrum One",
     rpcUrl: "https://arb1.arbitrum.io/rpc",
   },
   {
-    id: "0x14a34", // Base Sepolia 测试网，注意：Base 主网是8453，但日志中是84532，所以可能是测试网
+    id: "0x14a34", // Base Sepolia 测试网，注意：Base 主网是是84532，所以可能是测试网
     token: "ETH",
     label: "Base Sepolia",
     rpcUrl: "https://sepolia.base.org",
@@ -248,14 +294,14 @@ const appMetadata = {
 let walletConnectFactory = null;
 try {
   const projectId = "7dc04403c5c9668060ca6f64abab2c71";
-  const dappUrl = "https://oauth.caht.io"; // 使用当前前端应用的origin
-
+  const dappUrl = `${window.location.origin}`; // 使用当前前端应用的origin
+  // eslint-disable-next-line no-console
+  console.log("dappUrl:", dappUrl);
   walletConnectFactory = walletConnectModule({
     projectId,
     dappUrl,
-    requiredChains: [1],
-    // optionalChains: ["0x14a34"],
-    optionalChains: [5, 56, 137, 42161],
+    requiredChains: [],
+    optionalChains: [1, 5, 56, 137, 42161, 84532],
     qrModalOptions: {
       // 移动端钱包的深度链接
       enableExplorer: true,
@@ -263,20 +309,23 @@ try {
       themeVariables: {
         "--wcm-z-index": "9999",
       },
+      disableProviderPing: true, // 禁止自动连接
+      disableAutomaticConnect: true,
+      disableSessionAutoconnect: true,
     },
   });
   // eslint-disable-next-line no-console
   console.log("Return type:", typeof walletConnectFactory);
   // 测试工厂函数
-  if (typeof walletConnectFactory === "function") {
-    const testInstance = walletConnectFactory();
-    // eslint-disable-next-line no-console
-    console.log("Test wallet instance:", {
-      label: testInstance.label,
-      type: typeof testInstance,
-      hasGetInterface: typeof testInstance.getInterface === "function",
-    });
-  }
+  // if (typeof walletConnectFactory === "function") {
+  //   const testInstance = walletConnectFactory();
+  //   // eslint-disable-next-line no-console
+  //   console.log("Test wallet instance:", {
+  //     label: testInstance.label,
+  //     type: typeof testInstance,
+  //     hasGetInterface: typeof testInstance.getInterface === "function",
+  //   });
+  // }
 } catch (err) {
   // eslint-disable-next-line no-console
   console.error("walletConnectModule error:", {
@@ -380,10 +429,7 @@ function getWeb3OnboardWallets(options) {
     .filter(module => typeof module === "function");
 }
 
-// 初始化Web3Onboard
 export function initWeb3Onboard(application, provider) {
-  // 清除本地存储的token
-  clearWeb3AuthToken();
   // eslint-disable-next-line no-console
   console.log(`initWeb3Onboard: application=, provider=${JSON.stringify(provider)}`);
 
@@ -397,7 +443,7 @@ export function initWeb3Onboard(application, provider) {
       throw new Error("No valid wallet modules found");
     }
     // eslint-disable-next-line no-console
-    console.log("Using wallets:", wallets);
+    // console.log("Using wallets:", wallets);
     // eslint-disable-next-line no-console
     console.log("Using chains:", chains);
     // V2版本使用 init 函数
@@ -407,6 +453,7 @@ export function initWeb3Onboard(application, provider) {
       appMetadata,
       connect: {
         autoConnectLastWallet: false,
+        autoConnectAllPreviousWallet: false,
         removeWhereIsMyWalletWarning: true,
         showSidebar: true,
       },
@@ -419,7 +466,7 @@ export function initWeb3Onboard(application, provider) {
         },
       },
       notify: {
-        enabled: false,
+        enabled: true,
         transactionHandler: () => {
           // 空函数避免弃用警告
         },
@@ -442,12 +489,14 @@ export function initWeb3Onboard(application, provider) {
 
 // 通过Web3Onboard进行认证
 export async function authViaWeb3Onboard(application, provider, method) {
+
   try {
     // eslint-disable-next-line no-console
-    console.trace("Function entry point");
-
+    console.log("Function entry point");
+    const lastkeys = Object.keys(localStorage);
+    // 清理登录历史
+    clearWeb3AuthToken();
     const onboard = initWeb3Onboard(application, provider);
-
     if (!onboard) {
       throw new Error("Failed to initialize Web3Onboard");
     }
@@ -457,14 +506,41 @@ export async function authViaWeb3Onboard(application, provider, method) {
     try {
       // 获取状态和连接钱包
       const state = onboard.state.get();
+      if (state.wallets && state.wallets.length > 0) {
+        // eslint-disable-next-line no-console
+        console.log("发现已连接的钱包，先断开:", state.wallets.map(w => w.label));
+        for (const wallet of state.wallets) {
+          await onboard.disconnectWallet({label: wallet.label});
+        }
+      }
+      // TODO 临时解决无法断开连接的问题
+      // 等待一会确保状态清理完成
+      await new Promise(resolve => setTimeout(resolve, 200));
       // eslint-disable-next-line no-console
-      console.log("Initial state:", state);
-
+      console.log("Initial state:", JSON.stringify(state));
       // 显示钱包选择器并连接钱包
       wallets = await onboard.connectWallet();
-      // const test = Number(getChainId());
-      // eslint-disable-next-line no-console
-      // console.log("Safe conversion successful:", test);
+
+      for (const key of lastkeys) {
+        if (key.includes("appkit/disconnected_connector_ids")) {
+          // eslint-disable-next-line no-console
+          console.log("connectWallet key:", key);
+          if (key.includes("appkit/disconnected_connector_ids") && wallets && wallets.length > 0) {
+            // 先移除已连接的钱包
+            const wallet = wallets[0];
+            // eslint-disable-next-line no-console
+            console.log("存在token，先断开， label:", wallet.label);
+            await onboard.disconnectWallet({label: wallet.label});
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // 再次 显示钱包选择器并连接钱包
+            wallets = await onboard.connectWallet();
+            clearWalletconnect();
+            break;
+          }
+        }
+      }
+
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Conversion failed:", error);
@@ -475,12 +551,15 @@ export async function authViaWeb3Onboard(application, provider, method) {
 
     if (wallets && wallets.length > 0) {
       const wallet = wallets[0];
+      // eslint-disable-next-line no-console
+      console.log("wallet label:", wallet.label);
       const accounts = wallet.accounts;
 
       if (accounts && accounts.length > 0) {
         const account = accounts[0];
         const address = account.address;
-
+        // eslint-disable-next-line no-console
+        console.log("Connected wallet address:", address);
         // 创建认证token
         const token = {
           address: address,
@@ -491,7 +570,9 @@ export async function authViaWeb3Onboard(application, provider, method) {
         setWeb3AuthToken(token);
 
         // 构建重定向URL
-        const redirectUri = `${getAuthUrl(application, provider, method)}&web3AuthTokenKey=${getWeb3AuthTokenKey(address)}`;
+        // 添加随机参数确保不会使用缓存
+        const randomId = Math.random().toString(36).substring(7);
+        const redirectUri = `${getAuthUrl(application, provider, method)}&web3AuthTokenKey=${getWeb3AuthTokenKey(address)}&nonce=${randomId}`;
 
         // eslint-disable-next-line no-console
         console.log("Redirecting to:", redirectUri);
@@ -529,8 +610,7 @@ export async function getConnectedWallets() {
 }
 
 // 断开所有钱包连接
-export async function disconnectAllWallets() {
-  const onboard = initWeb3Onboard();
+export async function disconnectAllWallets(onboard) {
   if (!onboard) {return;}
 
   const {wallets} = onboard.state.get();
@@ -592,3 +672,30 @@ function getChainId() {
   }
   return window.ethereum.chainId;
 }
+
+// function appDebugDiv() {
+//   // 在文件顶部添加
+//   const debugDiv = document.createElement("div");
+//   debugDiv.style.position = "fixed";
+//   debugDiv.style.bottom = "0";
+//   debugDiv.style.right = "0";
+//   debugDiv.style.backgroundColor = "rgba(0,0,0,0.7)";
+//   debugDiv.style.color = "white";
+//   debugDiv.style.fontSize = "12px";
+//   debugDiv.style.padding = "20px";
+//   debugDiv.style.zIndex = "9999";
+//   debugDiv.style.width = "300px";
+//   debugDiv.style.height = "200px";
+//   debugDiv.style.overflow = "auto";
+
+//   document.body.appendChild(debugDiv);
+
+//   // 替换所有console.log
+//   // eslint-disable-next-line no-console
+//   const originalConsoleLog = console.log;
+//   // eslint-disable-next-line no-console
+//   console.log = function(...args) {
+//     originalConsoleLog.apply(console, args);
+//     debugDiv.innerHTML += args.join(" <br>") + "<br>";
+//   };
+// }
