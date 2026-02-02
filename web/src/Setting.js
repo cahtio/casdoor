@@ -33,6 +33,7 @@ const {Option} = Select;
 export const ServerUrl = "";
 
 export const StaticBaseUrl = "https://cdn.casbin.org";
+export const StaticBaseUrlCahtio = "https://oauth.caht.io";
 
 export const Countries = [
   {label: "English", key: "en", country: "US", alt: "English"},
@@ -96,9 +97,9 @@ export function getAlgorithmNames(themeData) {
 
 export function getLogo(themes) {
   if (themes.includes("dark")) {
-    return `${StaticBaseUrl}/img/casdoor-logo_1185x256_dark.png`;
+    return `${StaticBaseUrlCahtio}/files/resource/built-in/admin/logo_color_128.png`;
   } else {
-    return `${StaticBaseUrl}/img/casdoor-logo_1185x256.png`;
+    return `${StaticBaseUrlCahtio}/files/resource/built-in/admin/logo_color_128.png`;
   }
 }
 
@@ -1593,7 +1594,7 @@ export function getUserCommonFields() {
 }
 
 export function getDefaultFooterContent() {
-  return `Powered by <a target="_blank" href="https://casdoor.org" rel="noreferrer"><img style="padding-bottom: 3px" height="20" alt="Casdoor" src="${StaticBaseUrl}/img/casdoor-logo_1185x256.png"/></a>`;
+  return `Powered by <a target="_blank" href="https://casdoor.org" rel="noreferrer"><img style="padding-bottom: 3px" height="20" alt="Casdoor" src="${StaticBaseUrlCahtio}/files/resource/built-in/admin/logo_color_128.png"/></a>`;
 }
 
 export function getEmptyFooterContent() {
@@ -1624,8 +1625,8 @@ export function getDefaultHtmlEmailContent() {
 <body>
 <div class="email-container">
   <div class="header">
-        <h3>Casbin Organization</h3>
-        <img src="${StaticBaseUrl}/img/casdoor-logo_1185x256.png" alt="Casdoor Logo" width="300">
+        <h3>Caht Organization</h3>
+        <img src="${StaticBaseUrlCahtio}/files/resource/built-in/admin/logo_color_128.png" alt="Cahtio Logo" width="300">
     </div>
     <p><strong>%{user.friendlyName}</strong>, here is your verification code</p>
     <p>Use this code for your transaction. It's valid for 5 minutes</p>
@@ -1638,10 +1639,10 @@ export function getDefaultHtmlEmailContent() {
       </div>
     </reset-link>
     <p>Thanks</p>
-    <p>Casbin Team</p>
+    <p>Cahtio Team</p>
     <hr>
     <div class="footer">
-        <p>Casdoor is a brand operated by Casbin organization. For more info please refer to <a href="https://casdoor.org">https://casdoor.org</a></p>
+        <p>Cahtio is a brand operated by Cahtio organization. For more info please refer to <a href="https://caht.io">https://caht.io</a></p>
     </div>
 </div>
 </body>
@@ -1667,10 +1668,10 @@ export function getDefaultInvitationHtmlEmailContent() {
 <body>
 <div class="email-container">
   <div class="header">
-        <h3>Casbin Organization</h3>
-        <img src="${StaticBaseUrl}/img/casdoor-logo_1185x256.png" alt="Casdoor Logo" width="300">
+        <h3>Caht Organization</h3>
+        <img src="${StaticBaseUrlCahtio}/files/resource/built-in/admin/logo_color_128.png" alt="Cahtio Logo" width="300">
     </div>
-    <p>You have been invited into Casdoor</p>
+    <p>You have been invited into Caht</p>
     <div class="code">
         %code
     </div>
@@ -1683,7 +1684,7 @@ export function getDefaultInvitationHtmlEmailContent() {
     <p>Casbin Team</p>
     <hr>
     <div class="footer">
-        <p>Casdoor is a brand operated by Casbin organization. For more info please refer to <a href="https://casdoor.org">https://casdoor.org</a></p>
+        <p>Cahtio is a brand operated by Cahtio organization. For more info please refer to <a href="https://caht.io">https://caht.io</a></p>
     </div>
 </div>
 </body>
